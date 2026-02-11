@@ -1,0 +1,1 @@
+npx create-expo-app@latest fastpass-app --template blank  CODIGO PARA INICIAR LA APP

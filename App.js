@@ -1,112 +1,144 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { StyleSheet, View, Text, Platform } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Ionicons } from '@expo/vector-icons'; // Iconos bonitos para el menú
+import { Ionicons } from '@expo/vector-icons';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-// --- MOCKUP DE TUS COMPONENTES (Para que la App no falle mientras migras los archivos reales) ---
-// Cuando ya tengas tus archivos .js migrados a Native, descomenta los imports de abajo y borra esto.
-const HomePage = () => <View style={styles.center}><Text>Home Screen</Text></View>;
-const EventsPage = () => <View style={styles.center}><Text>Events List</Text></View>;
-const ResalePage = () => <View style={styles.center}><Text>Resale Page</Text></View>;
-const UserAccountPage = () => <View style={styles.center}><Text>Mi Cuenta</Text></View>;
-const LoginPage = () => <View style={styles.center}><Text>Login Screen</Text></View>;
-// El detalle necesita recibir parámetros (ID del evento)
-const EventDetail = ({ route }) => {
-  const { eventId } = route.params || {}; 
-  return <View style={styles.center}><Text>Detalle del Evento ID: {eventId}</Text></View>;
+// --- IMPORTS REALES DE TUS PANTALLAS ---
+import HomeScreen from './src/screens/Home/HomeScreen';
+import ChatbotScreen from './src/screens/Chatbot/ChatbotScreen';
+import MyTicketsScreen from './src/screens/MyTickets/MyTicketsScreen';
+import ProfileScreen from './src/screens/Profile/ProfileScreen';
+
+// --- COMPONENTES AUXILIARES ---
+const EventDetailPlaceholder = ({ route }) => {
+  const { eventId } = route.params || {};
+  return (
+    <View style={styles.center}>
+      <Text style={{fontSize: 18, fontWeight: 'bold', color: '#fff'}}>Detalle del Evento</Text>
+      <Text style={{color: '#fff'}}>ID recibido: {eventId}</Text>
+      <Text style={{marginTop: 10, color: 'gray'}}>Aquí iría la info del Venue, precios y mapa.</Text>
+    </View>
+  );
 };
 
-/* IMPORTS REALES (Descomentar cuando migres cada archivo):
-  import { AuthProvider, useAuth } from './context/AuthContext'; 
-  import HomePage from './components/HomePage';
-  import EventsPage from './components/EventsPage';
-  // ... etc
-*/
-
-// Simulamos el AuthContext para este ejemplo
-const AuthContext = React.createContext();
-const AuthProvider = ({ children }) => <AuthContext.Provider value={{ user: null }}>{children}</AuthContext.Provider>;
-const useAuth = () => React.useContext(AuthContext);
-
 // --- CONFIGURACIÓN DE NAVEGACIÓN ---
-
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-// 1. El Grupo de Pestañas (Menú inferior)
+// 1. Grupo de Pestañas (Menú Inferior)
 function MainTabs() {
-  const { user } = useAuth();
-
   return (
-    <Tab.Navigator
-      screenOptions={({ route }) => ({
-        headerShown: false, // Ocultamos el header default de las tabs
-        tabBarStyle: { backgroundColor: '#121212', borderTopColor: '#333' },
-        tabBarActiveTintColor: '#4ADE80', // Color activo (verde neón)
-        tabBarInactiveTintColor: 'gray',
-        tabBarIcon: ({ focused, color, size }) => {
-          let iconName;
-          if (route.name === 'Home') iconName = focused ? 'home' : 'home-outline';
-          else if (route.name === 'Eventos') iconName = focused ? 'calendar' : 'calendar-outline';
-          else if (route.name === 'Reventa') iconName = focused ? 'cash' : 'cash-outline';
-          else if (route.name === 'Cuenta') iconName = focused ? 'person' : 'person-outline';
-          return <Ionicons name={iconName} size={size} color={color} />;
-        },
-      })}
-    >
-      <Tab.Screen name="Home" component={HomePage} />
-      <Tab.Screen name="Eventos" component={EventsPage} />
-      <Tab.Screen name="Reventa" component={ResalePage} />
-      {/* Lógica condicional: Si hay usuario va a Cuenta, si no a Login */}
-      <Tab.Screen 
-        name="Cuenta" 
-        component={user ? UserAccountPage : LoginPage} 
-        options={{ title: user ? 'Mi Perfil' : 'Iniciar Sesión' }}
-      />
-    </Tab.Navigator>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#0f0f0f' }} edges={['left', 'right']}>
+      <Tab.Navigator
+        screenOptions={({ route }) => ({
+          headerShown: false,
+          tabBarStyle: { 
+            backgroundColor: '#121212', 
+            borderTopColor: '#1a1a1a',
+            borderTopWidth: 1.5,
+            height: Platform.OS === 'ios' ? 85 : 70,
+            paddingBottom: Platform.OS === 'ios' ? 25 : 12,
+            paddingTop: 8,
+            paddingHorizontal: 4,
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: -2 },
+            shadowOpacity: 0.15,
+            shadowRadius: 6,
+            elevation: 5,
+          },
+          tabBarActiveTintColor: '#4ADE80',
+          tabBarInactiveTintColor: '#666',
+          tabBarLabelStyle: {
+            fontSize: 11,
+            marginTop: 4,
+            marginBottom: Platform.OS === 'ios' ? 0 : 4,
+            fontWeight: '500',
+          },
+          tabBarIcon: ({ focused, color, size }) => {
+            let iconName;
+
+            if (route.name === 'Home') {
+              iconName = focused ? 'home' : 'home-outline';
+            } else if (route.name === 'IA') {
+              iconName = focused ? 'chatbubbles' : 'chatbubbles-outline';
+            } else if (route.name === 'Mis Boletos') {
+              iconName = focused ? 'ticket' : 'ticket-outline';
+            } else if (route.name === 'Cuenta') {
+              iconName = focused ? 'person' : 'person-outline';
+            }
+
+            return <Ionicons name={iconName} size={size} color={color} />;
+          },
+        })}
+      >
+        <Tab.Screen 
+          name="Home" 
+          component={HomeScreen} 
+          options={{ title: 'Inicio' }}
+        />
+        <Tab.Screen 
+          name="IA" 
+          component={ChatbotScreen} 
+          options={{ title: 'Asistente' }}
+        />
+        <Tab.Screen 
+          name="Mis Boletos" 
+          component={MyTicketsScreen} 
+          options={{ title: 'Boletos' }}
+        />
+        <Tab.Screen 
+          name="Cuenta" 
+          component={ProfileScreen} 
+          options={{ title: 'Perfil' }}
+        />
+      </Tab.Navigator>
+    </SafeAreaView>
   );
 }
 
-// 2. El Stack Principal (Maneja la navegación entre pantallas que no están en el menú, como detalles)
+// 2. Stack Principal (Orquestador Global)
 export default function App() {
   return (
-    <AuthProvider>
-      <NavigationContainer>
-        <Stack.Navigator 
-          screenOptions={{
-            headerStyle: { backgroundColor: '#121212' },
-            headerTintColor: '#fff',
-            headerTitleStyle: { fontWeight: 'bold' },
-          }}
-        >
-          {/* La pantalla principal son las Tabs */}
-          <Stack.Screen 
-            name="Main" 
-            component={MainTabs} 
-            options={{ headerShown: false }} 
-          />
-          
-          {/* Pantallas "hijas" que se superponen al menú */}
-          <Stack.Screen 
-            name="EventDetail" 
-            component={EventDetail} 
-            options={{ title: 'Detalle del Evento' }} 
-          />
-          
-          {/* Aquí agregarías AddEvent, HelpPage, etc. */}
-        </Stack.Navigator>
-      </NavigationContainer>
-    </AuthProvider>
+    <NavigationContainer>
+      <Stack.Navigator
+        screenOptions={{
+          headerStyle: { backgroundColor: '#0f0f0f' },
+          headerTintColor: '#fff',
+          headerTitleStyle: { fontWeight: 'bold' },
+          contentStyle: { backgroundColor: '#0f0f0f' },
+          headerShown: false,
+        }}
+      >
+        <Stack.Screen 
+          name="Main" 
+          component={MainTabs} 
+          options={{ headerShown: false }} 
+        />
+
+        <Stack.Screen 
+          name="EventDetail" 
+          component={EventDetailPlaceholder} 
+          options={{ title: 'Detalle del Evento' }} 
+        />
+        
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 
+// Estilos globales
 const styles = StyleSheet.create({
   center: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff', // Cambiar a oscuro si prefieres
+    backgroundColor: '#0f0f0f', 
   },
 });

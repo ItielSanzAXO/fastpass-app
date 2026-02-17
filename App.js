@@ -35,23 +35,18 @@ function MainTabs() {
       <Tab.Navigator
         screenOptions={({ route }) => ({
           headerShown: false,
-          tabBarStyle: { 
+          tabBarStyle: {
             backgroundColor: '#121212', 
-            borderTopColor: '#1a1a1a',
-            borderTopWidth: 1.5,
-            height: Platform.OS === 'ios' ? 85 : 70,
-            paddingBottom: Platform.OS === 'ios' ? 25 : 12,
-            paddingTop: 8,
-            paddingHorizontal: 4,
-            position: 'absolute',
+            borderTopColor: '#333',
+            borderTopWidth: 1, // Borde sutil arriba
+            height: 90,        // <--- AUMENTADO (Antes 60) para dar espacio
+            paddingBottom: 30, // <--- AUMENTADO (Antes 8) para separar de la barra de gestos
+            paddingTop: 10,
+            position: 'absolute', // Opcional: ayuda a que se vea flotante y moderno
             bottom: 0,
             left: 0,
             right: 0,
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: -2 },
-            shadowOpacity: 0.15,
-            shadowRadius: 6,
-            elevation: 5,
+            elevation: 0,      // Quita sombras feas en Android
           },
           tabBarActiveTintColor: '#4ADE80',
           tabBarInactiveTintColor: '#666',
